@@ -2,7 +2,7 @@ import pandas as pd
 import pickle
 import numpy as np
 from keras.models import Sequential
-from keras.layers import Dense, Dropout, Flatten, Lambda, ELU, Activation
+from keras.layers import Dense, Dropout, Flatten, Lambda, ELU, Activation, BatchNormalization
 from keras.layers.convolutional import Convolution2D, MaxPooling2D
 from keras.preprocessing.image import ImageDataGenerator
 from matplotlib.image import imread
@@ -62,10 +62,8 @@ def balance_data(x, y):
             y = np.concatenate((y, y_bin))
     return x, y
 
-x_train, y_train = balance_data(x_train, y_train)
-
 x_aug, y_aug = [], []
-for img, angle in x_train, y_train:
+for img, angle in zip(x_train, y_train):
     img_blur, angle_blur = transforms.blur(img, angle)
     img_gray, angle_gray = transforms.gray(img, angle)
     img_mirror, angle_mirror = transforms.mirror(img, angle)
@@ -73,6 +71,8 @@ for img, angle in x_train, y_train:
     y_aug.extend([angle_blur, angle_gray, angle_mirror])
 x_train = np.concatenate((x_train, x_aug))
 y_train = np.concatenate((y_train, y_aug))
+
+x_train, y_train = balance_data(x_train, y_train)
 '''
 
 def rand_mirror(X, y):
@@ -120,17 +120,21 @@ model = Sequential()
 model.add(Convolution2D(8, 7, 7, input_shape=(new_height, new_width, depth)))
 model.add(MaxPooling2D((2, 2)))
 model.add(ELU())
-#model.add(Dropout(0.5))
+model.add(BatchNormalization())
 model.add(Convolution2D(8, 5, 5))
 model.add(MaxPooling2D((2, 2)))
 model.add(ELU())
+model.add(BatchNormalization())
 model.add(Dropout(0.5))
 model.add(Flatten())
 model.add(Dense(512))
+model.add(BatchNormalization())
 model.add(ELU())
 model.add(Dense(256))
+model.add(BatchNormalization())
 model.add(ELU())
 model.add(Dense(128))
+model.add(BatchNormalization())
 model.add(ELU())
 model.add(Dense(1))
 model.compile('adam', 'mean_squared_error', ['accuracy'])
