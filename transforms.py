@@ -38,7 +38,7 @@ def gray(img, angle):
 
 
 def shift(img, angle, size=64):
-    angle_offset_per_pixel = 0.006
+    angle_offset_per_pixel = 0.005
     max_shift = 16
     x_shift, y_shift = np.random.random_integers(-max_shift, max_shift, 2)
     shifted_angle = angle + x_shift * angle_offset_per_pixel
