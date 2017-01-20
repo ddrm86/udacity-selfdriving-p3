@@ -3,7 +3,7 @@ import numpy as np
 from matplotlib.image import imread
 import pickle
 
-base_dir = '../my-data/'
+base_dir = '../udacity-data/'
 driving_log_file = 'driving_log.csv'
 dlog = pd.read_csv(base_dir + driving_log_file)
 
@@ -22,5 +22,6 @@ print(X_train.shape, y_train.shape)
 dic = dict()
 dic['features'] = X_train
 dic['labels'] = y_train
-with open(base_dir + 'train.p', 'wb') as f:
-    pickle.dump(dic, f)
+with open(base_dir + 'trainx.npy', 'wb') as fx, open(base_dir + 'trainy.npy', 'wb') as fy:
+    np.save(fx, X_train)
+    np.save(fy, y_train)
