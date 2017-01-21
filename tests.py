@@ -137,6 +137,7 @@ model.add(Dense(128))
 model.add(BatchNormalization())
 model.add(ELU())
 model.add(Dense(1))
+model.add(Activation('tanh'))
 model.compile('adam', 'mean_squared_error', ['accuracy'])
 
 history = model.fit_generator(datagen.flow(x_train, y_train, batch_size=32), samples_per_epoch=len(x_train),
