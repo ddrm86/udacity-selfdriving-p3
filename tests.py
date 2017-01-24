@@ -73,41 +73,12 @@ x_train = np.concatenate((x_train, x_aug))
 y_train = np.concatenate((y_train, y_aug))
 
 x_train, y_train = balance_data(x_train, y_train)
-'''
 
-def rand_mirror(X, y):
-    i = randint(0, len(X)-1)
-    new_X = cv2.flip(X[i], 1)
-    new_y = -y[i]
-    return new_X, new_y
-
-X_mirror, y_mirror = [], []
-for i in range(15000):
-    new_X, new_y = rand_mirror(x_train, y_train)
-    X_mirror.append(new_X)
-    y_mirror.append(new_y)
-X_mirror, y_mirror = np.array(X_mirror), np.array(y_mirror)
-
-def rand_noise(X, y):
-    i = randint(0, len(X)-1)
-    noise_max = 20
-    noise_mask = np.random.randint(0, noise_max, (64, 64, 3), dtype='uint8')
-    new_X = cv2.add(X[i], noise_mask)
-    new_y = y[i]
-    return new_X, new_y
-
-X_noise, y_noise = [], []
-for i in range(15000):
-    new_X, new_y = rand_noise(x_train, y_train)
-    X_noise.append(new_X)
-    y_noise.append(new_y)
-X_noise, y_noise = np.array(X_noise), np.array(y_noise)
-
-x_train = np.concatenate((x_train, X_mirror, X_noise))
-y_train = np.concatenate((y_train, y_mirror, y_noise))
-'''
 print(x_train.shape)
 print(y_train.shape)
+
+
+
 
 datagen = ImageDataGenerator(
     #rescale=1. / 255
@@ -117,7 +88,16 @@ print(x_train.shape)
 print(y_train.shape)
 
 model = Sequential()
-model.add(Flatten(input_shape=(new_height, new_width, depth)))
+model.add(Convolution2D(8, 7, 7, input_shape=(new_height, new_width, depth)))
+model.add(MaxPooling2D((2, 2)))
+model.add(ELU())
+model.add(BatchNormalization())
+model.add(Convolution2D(8, 5, 5))
+model.add(MaxPooling2D((2, 2)))
+model.add(ELU())
+model.add(BatchNormalization())
+model.add(Dropout(0.5))
+model.add(Flatten())
 model.add(Dense(512))
 model.add(BatchNormalization())
 model.add(ELU())
