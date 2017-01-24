@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np
 from matplotlib.image import imread
-import pickle
 
 base_dir = '../udacity-data/'
 driving_log_file = 'driving_log.csv'
@@ -19,9 +18,6 @@ for index, row in dlog.iterrows():
     y_train.extend([center_steering, left_steering, right_steering])
 X_train, y_train = np.array(X_train), np.array(y_train)
 print(X_train.shape, y_train.shape)
-dic = dict()
-dic['features'] = X_train
-dic['labels'] = y_train
 with open(base_dir + 'trainx.npy', 'wb') as fx, open(base_dir + 'trainy.npy', 'wb') as fy:
     np.save(fx, X_train)
     np.save(fy, y_train)
