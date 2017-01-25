@@ -49,8 +49,9 @@ def shift(img, angle, size=64):
 
 
 if __name__ == '__main__':
-    img_test = plt.imread('test.jpg')
-    img_test, img_angle = shift(img_test, 0.5)
+    img_test = plt.imread('images/resized.jpg')
+    img_test, img_angle = gray(img_test, 0.5)
     print(img_angle)
     plt.imshow(img_test)
     plt.show()
+    plt.imsave('images/out.jpg', img_test)
