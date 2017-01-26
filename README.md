@@ -61,3 +61,6 @@ After the convolutions, there are three blocks of fully connected layers of 512,
 The last layer consists on a single neuron that outputs the predicted steering angle, followed by a tanh activation function, that smooths the output and keeps it between -1 and 1 (thanks to [https://carnd-forums.udacity.com/questions/35229158/answers/35229284](https://carnd-forums.udacity.com/questions/35229158/answers/35229284 "Mikel Bober-Irizar")).
 
 
+### 3. The training
+
+The model was trained using the Adam optimizer and the mean squared error as the objective function to minimize. A small batch size of 32 was used to reduce memory usage. The model was trained for 5 epochs, since a bigger number did not seem to improve the results. All the samples were used in each epoch.
