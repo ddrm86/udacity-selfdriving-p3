@@ -1,33 +1,21 @@
 import data_prep
-from keras.models import Sequential
-from keras.layers import Dense, Dropout, Flatten, ELU, Activation, BatchNormalization
-from keras.layers.convolutional import Convolution2D, MaxPooling2D
+import model_creation
+import json
+from keras.preprocessing.image import ImageDataGenerator
+import tensorflow as tf
+tf.python.control_flow_ops = tf
 
 
-def get_model():
-    input_shape = (data_prep.new_height, data_prep.new_width, data_prep.depth)
+x_train, x_validation, y_train, y_validation = data_prep.prep_data()
 
-    model = Sequential()
-    model.add(Convolution2D(8, 7, 7, input_shape=input_shape))
-    model.add(MaxPooling2D((2, 2)))
-    model.add(ELU())
-    model.add(BatchNormalization())
-    model.add(Convolution2D(8, 5, 5))
-    model.add(MaxPooling2D((2, 2)))
-    model.add(ELU())
-    model.add(BatchNormalization())
-    model.add(Dropout(0.5))
-    model.add(Flatten())
-    model.add(Dense(512))
-    model.add(BatchNormalization())
-    model.add(ELU())
-    model.add(Dense(256))
-    model.add(BatchNormalization())
-    model.add(ELU())
-    model.add(Dense(128))
-    model.add(BatchNormalization())
-    model.add(ELU())
-    model.add(Dense(1))
-    model.add(Activation('tanh'))
+datagen = ImageDataGenerator()
+model = model_creation.get_model()
+model.compile('adam', 'mean_squared_error', ['accuracy'])
+history = model.fit_generator(datagen.flow(x_train, y_train, batch_size=32), samples_per_epoch=len(x_train),
+                              nb_epoch=5, validation_data=datagen.flow(x_validation, y_validation, batch_size=32),
+                              nb_val_samples=len(x_validation))
+print(history)
 
-    return model
+model.save_weights("model.h5", True)
+with open('model.json', 'w') as outfile:
+    json.dump(model.to_json(), outfile)
