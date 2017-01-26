@@ -7,7 +7,7 @@ The data provided by Udacity was used for this project. To make the most of it, 
 
 After this, the images are resized to 64x64, since it makes training faster and consume less memory.
 The data is then split 80/20 in training and validation datasets. Although this can help spot problems with the model, like overfitting, the only valid test is watching the model drive the car through track 1.
-The training dataset is not balanced: some steering angles, like 0.0, are overrepresented, which may cause the model to be biased toward driving the car straight. Another problem is that all the data comes from the same track. Even if a good performance in a different setting is not required to pass the project, it will be desirable that the model can generalize to other tracks.
+The training dataset is not balanced: some steering angles, like 0.0, are overrepresented, which may cause the model to be biased towards driving the car straight. Another problem is that all the data comes from the same track. Even if a good performance in a different setting is not required to pass the project, it would be desirable that the model can generalize to other tracks.
 
 In order to improve generalization, the training dataset is balanced and augmented by applying filters to create new artificial images from the original data.
 Six image transformation processes were used:
@@ -16,10 +16,10 @@ Six image transformation processes were used:
 - Noise: a random value between [0, 20] is added to every color channel of every pixel. This may help the model be less biased towards specific colors, that can change based on the weather, location, time of the day, and such.
 - Brightness: the brightness of the original image is changed randomly. The original data is taken at the same hour, with the same weather. This transformation can help the model generalize better under different lightning conditions.
 - Blur: Gaussian blur with a 3x3 kernel is applied to the image. The idea is to make the detection of borders and shapes more flexible.
-- Gray: image is converted to grayscale and then back to RGB, to keep the (64, 64, 3) shape. Like the noise transformation, this may help the model be less biased towards specific colors.
+- Gray: the image is converted to grayscale and then back to RGB, to keep the (64, 64, 3) shape. Like the noise transformation, this may help the model be less biased towards specific colors.
 - Shift: the original image is shifted horizontally and vertically a random pixel offset between [-16, 16]. The original steering angle is adjusted adding the horizontal offset times 0.005.
 This "angle offset per pixel" constant was devised partly by trial and error, partly by estimating the distance in pixels from an image created by the center camera and the corresponding image created by the left camera, following a reference point. This gives an approximate distance of 210 pixels. With the angle correction of 0.25 (also an approximation), we have a correction of 0.25 / 210 = 0.001190476 per pixel for the original sized images, that are 5 times bigger than the resized ones. The estimation suggest a correction of 0.001190476 * 5 = 0.005952381 per pixel for the resized images, but I found out through testing that a constant of 0.005 works better.
-This transformation help generating more data, adding angles that are not present in the original data, and simulating slopes.
+This transformation helps generating more data, adding angles that are not present in the original data, and simulating slopes.
 
 ###### Some examples:
 
@@ -54,7 +54,7 @@ The final architecture follows the diagram below:
 
 The first block consists on 8 convolutional 7x7 filters, followed by a 2x2 max-pooling layer, an activation layer that uses exponential linear units (ELUs) and a batch normalization layer. The choice of ELUs over reLUs is due to the former giving a smoother output. Batch normalization is used in most blocks to keep the values whitened during the whole pipeline.
 
-The second and last block of convolutions is similar to the first one, except this one has 5x5 filters, and dropout of 0.5 is added at the end, to prevent overfitting. The output is flattened after this second block.
+The second and last block of convolutions is similar to the first one, except this one has 5x5 filters, and dropout of 0.5 is added at the end to prevent overfitting. The output is flattened after this second block.
 
 After the convolutions, there are three blocks of fully connected layers of 512, 256 and 128. Each layer is followed by batch normalization and a ELU activation layer.
 
@@ -64,3 +64,12 @@ The last layer consists on a single neuron that outputs the predicted steering a
 ### 3. The training
 
 The model was trained using the Adam optimizer and the mean squared error as the objective function to minimize. A small batch size of 32 was used to reduce memory usage. The model was trained for 5 epochs, since a bigger number did not seem to improve the results. All the samples were used in each epoch.
+
+
+### 4. The results
+
+Using the proposed model for predicting the steering angles, the car is able to drive several times through track 1 without any problems, although its movements are wavy at times:
+
+[![Driving through track one](http://img.youtube.com/vi/lVRYG3_I8HM/0.jpg)](http://www.youtube.com/watch?v=lVRYG3_I8HM)
+
+The car is able to drive through most parts of track 2, but it is incapable to pass one of the steepest slopes, apparently due to lack of speed. This shows that the model is capable of generalizing to unseen circumstances, but a smoother driving (less wavy) would probably allow the car to speed up and work better in track 2.
